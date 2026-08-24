@@ -12,4 +12,4 @@ jobs:
         with:
           node-version: 20
           cache: 'npm'
-      - run: npm install && node scripts/build.js
+      - run: npm ci && node scripts/build.js
