@@ -1,12 +1,9 @@
 'use strict';
 
-const { escapeHtml } = require('./layout');
+const { escapeHtml, pickLocalized, formatCharCount } = require('./layout');
 
 const COVER_CLASSES = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'];
 const AVATAR_COLORS = ['var(--indigo)', 'var(--seal)', '#5b6b4f', '#8a6a3f', '#3a5560', '#7a3f56'];
-
-// 只吃扁平、已經整理好的顯示用資料(view model),不碰 work_id/edition_url
-// 這類內部資料結構——那些查找/反查邏輯留在 build.js,這裡純粹是「資料轉 HTML」。
 
 function renderSearchForm() {
   return `
@@ -22,40 +19,43 @@ function renderMetaField(label, value) {
   return `<div class="card-meta"><span class="meta-label">${escapeHtml(label)}</span><span class="meta-value">${escapeHtml(value)}</span></div>`;
 }
 
-function renderLatestCard(item, index) {
+function renderLatestCard(t, index) {
   const coverClass = COVER_CLASSES[index % COVER_CLASSES.length];
-  return `<a class="card" href="${escapeHtml(item.url)}">
+  const author = t.work && t.work.author;
+  const authorName = author ? pickLocalized(author.names) : '(未知作者)';
+  const workNativeTitle = t.work ? pickLocalized(t.work.title, ['ja', 'en', 'romaji', 'zh-TW']) : '';
+  return `<a class="card" href="/translations/${escapeHtml(t.uuid)}/">
       <div class="cover ${coverClass}">
-        <span class="cover-title">${escapeHtml(item.title)}</span>
+        <span class="cover-title">${escapeHtml(t.title)}</span>
       </div>
-      <div class="card-title-cn">${escapeHtml(item.workNativeTitle)}</div>
-      ${renderMetaField('作者', item.authorName)}
-      ${renderMetaField('譯者', item.translatorId)}
-      ${item.date ? renderMetaField('更新於', item.date) : ''}
+      <div class="card-title-cn">${escapeHtml(workNativeTitle)}</div>
+      ${renderMetaField('作者', authorName)}
+      ${renderMetaField('譯者', t.translatorId)}
+      ${t.date ? renderMetaField('更新於', t.date) : ''}
     </a>`;
 }
 
-function renderTranslatorCard(item, index) {
-  const initial = item.displayName.charAt(0);
+function renderTranslatorCard(translatorId, profile, translations, index) {
+  const displayName = (profile && profile.display_name) || translatorId;
+  const initial = displayName.charAt(0);
   const color = AVATAR_COLORS[index % AVATAR_COLORS.length];
-  return `<a class="t-card" href="${escapeHtml(item.url)}">
+  const charCount = translations.reduce((sum, t) => sum + t.charCount, 0);
+  return `<a class="t-card" href="/translators/${escapeHtml(translatorId)}/">
       <div class="t-avatar" style="background:${color};">${escapeHtml(initial)}</div>
       <div>
-        <div class="t-name">${escapeHtml(item.displayName)}</div>
-        <div class="t-desc">${escapeHtml(item.bio || '這位譯者還沒有寫自我介紹。')}</div>
-        <div class="t-count">累積 ${item.count} 篇譯文・${escapeHtml(item.charCountDisplay)}</div>
+        <div class="t-name">${escapeHtml(displayName)}</div>
+        <div class="t-desc">${escapeHtml((profile && profile.bio) || '這位譯者還沒有寫自我介紹。')}</div>
+        <div class="t-count">累積 ${translations.length} 篇譯文・${escapeHtml(formatCharCount(charCount))}</div>
       </div>
     </a>`;
 }
 
-/**
- * @param {object} data
- * @param {Array<{url:string,title:string,translatorId:string,authorName:string,date:?string,workNativeTitle:string}>} data.latestTranslations
- * @param {Array<{url:string,displayName:string,bio:?string,count:number,charCountDisplay:string}>} data.translatorList
- */
-function renderHomepage({ latestTranslations, translatorList }) {
+function renderHomepage({ latestTranslations, translators, translationsByTranslator }) {
   const latestHtml = latestTranslations.map(renderLatestCard).join('\n');
-  const translatorsHtml = translatorList.map(renderTranslatorCard).join('\n');
+  const translatorIds = Object.keys(translationsByTranslator);
+  const translatorsHtml = translatorIds
+    .map((id, i) => renderTranslatorCard(id, translators[id], translationsByTranslator[id], i))
+    .join('\n');
 
   const body = `
 ${renderSearchForm()}
@@ -71,7 +71,7 @@ ${renderSearchForm()}
   <div class="block-head">
     <div class="block-title serif">譯者一覽 <span class="jp">Translators</span></div>
   </div>
-  ${translatorList.length ? `<div class="translator-grid">${translatorsHtml}</div>` : '<p class="block-empty-note">目前還沒有譯者,敬請期待。</p>'}
+  ${translatorIds.length ? `<div class="translator-grid">${translatorsHtml}</div>` : '<p class="block-empty-note">目前還沒有譯者,敬請期待。</p>'}
 </section>
 `;
 
