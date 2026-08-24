@@ -46,6 +46,7 @@ function renderWork({ work, translations }) {
     <span>原文語言・${escapeHtml(work.original_language)}</span>
     ${work.category ? `<span>分類・${escapeHtml(work.category)}</span>` : ''}
   </div>
+  ${work.excerpt ? `<p class="desc">${escapeHtml(work.excerpt)}</p>` : ''}
   ${tags.length ? `<div class="tag-pills">${tagsHtml}</div>` : ''}
 </div>
 

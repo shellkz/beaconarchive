@@ -85,6 +85,9 @@ const SourceAuthorSchema = z
     names: LocalizedStringSchema,
     wikidata_id: z.string().optional(),
     url: z.string().url().optional(),
+    birth_date: z.string().optional(),
+    death_date: z.string().optional(),
+    excerpt: z.string().optional(),
   })
   .strict();
 

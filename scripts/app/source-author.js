@@ -14,11 +14,14 @@ function renderSourceAuthor({ author, works, translationsByWork }) {
   const name = pickLocalized(author.names);
   const initial = name.charAt(0);
   const list = works.map((w) => renderWorkRow(w, (translationsByWork[w.uuid] || []).length)).join('\n');
+  const lifespan = [author.birth_date, author.death_date].filter(Boolean).join(' ~ ');
 
   const body = `
 <div class="detail-hero">
   <div class="avatar-lg" style="background:var(--seal);">${escapeHtml(initial)}</div>
   <h1>${escapeHtml(name)}</h1>
+  ${lifespan ? `<div class="detail-meta"><span>生卒・${escapeHtml(lifespan)}</span></div>` : ''}
+  ${author.excerpt ? `<p class="desc">${escapeHtml(author.excerpt)}</p>` : ''}
 </div>
 
 <section class="block">
