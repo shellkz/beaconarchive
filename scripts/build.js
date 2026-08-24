@@ -30,7 +30,7 @@ const CONTENT_DIR = path.join(ROOT, 'content');
 const ASSETS_DIR = path.join(ROOT, 'assets');
 const OUT_DIR = path.join(ROOT, 'dist');
 
-const md = new MarkdownIt({ html: false, linkify: true }).use(footnote);
+const md = new MarkdownIt({ html: false, linkify: true, breaks: true }).use(footnote);
 
 // ---------- small helpers ----------
 

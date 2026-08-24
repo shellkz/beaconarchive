@@ -5,7 +5,7 @@ const footnote = require('markdown-it-footnote');
 const { escapeHtml, pickLocalized, workDisplayTitle } = require('./layout');
 
 const SITE_LICENSE = 'CC BY-SA 4.0';
-const md = new MarkdownIt({ html: false, linkify: true }).use(footnote);
+const md = new MarkdownIt({ html: false, linkify: true, breaks: true }).use(footnote);
 
 function renderTranslation(t) {
   const work = t.work;
