@@ -11,4 +11,4 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 20
-      - run: npm install && cd scripts && npm install && node build.js
+      - run: npm install && node scripts/build.js
