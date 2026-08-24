@@ -18,6 +18,26 @@ function escapeHtml(str) {
   }[c]));
 }
 
+function pickLocalized(value, fallbackKeyOrder = ['zh-TW', 'romaji', 'ja', 'en']) {
+  if (value == null) return null;
+  if (typeof value === 'string') return value;
+  for (const key of fallbackKeyOrder) {
+    if (value[key]) return value[key];
+  }
+  const firstKey = Object.keys(value)[0];
+  return firstKey ? value[firstKey] : null;
+}
+
+function workDisplayTitle(work) {
+  return (work && work.title && work.title['zh-TW']) || '';
+}
+
+function formatCharCount(n) {
+  if (n < 10000) return `${n}字`;
+  if (n < 100000) return `${(n / 10000).toFixed(1)}萬字`;
+  return `${Math.round(n / 10000)}萬字`;
+}
+
 function renderLayout({ title, body, canonical }) {
   return `<!doctype html>
 <html lang="zh-Hant" class="no-js">
@@ -68,4 +88,4 @@ ${body}
 `;
 }
 
-module.exports = { renderLayout, escapeHtml };
+module.exports = { renderLayout, escapeHtml, pickLocalized, workDisplayTitle, formatCharCount };

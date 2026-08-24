@@ -4,6 +4,6 @@ wikidata_id: Q317685
 names:
   ja: 太宰治
   romaji: Dazai Osamu
-  zh: 太宰治
-source_url: https://www.aozora.gr.jp/index_pages/person35.html
+  zh-TW: 太宰治
+url: https://www.aozora.gr.jp/index_pages/person35.html
 ---

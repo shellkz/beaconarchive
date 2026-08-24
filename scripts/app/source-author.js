@@ -1,40 +1,35 @@
 'use strict';
 
-const { escapeHtml } = require('./layout');
+const { escapeHtml, pickLocalized, workDisplayTitle } = require('./layout');
 
-function renderWorkRow(w) {
-  return `<a class="entry-row" href="${escapeHtml(w.url)}">
-      <div class="entry-title serif">${escapeHtml(w.title)}</div>
-      <div class="entry-meta">${escapeHtml(w.nativeTitle)} · ${w.translationCount} 個譯本</div>
+function renderWorkRow(w, translationCount) {
+  const nativeTitle = pickLocalized(w.title, ['ja', 'en', 'romaji', 'zh-TW']);
+  return `<a class="entry-row" href="/works/${escapeHtml(w.uuid)}/">
+      <div class="entry-title serif">${escapeHtml(workDisplayTitle(w))}</div>
+      <div class="entry-meta">${escapeHtml(nativeTitle)} · ${translationCount} 個譯本</div>
     </a>`;
 }
 
-/**
- * 原作者頁(寬版)。純渲染。
- * @param {object} vm
- * @param {string} vm.name
- * @param {Array<{url:string,title:string,nativeTitle:string,translationCount:number}>} vm.works
- * @param {string} vm.canonical
- */
-function renderSourceAuthor(vm) {
-  const initial = vm.name.charAt(0);
-  const list = vm.works.map(renderWorkRow).join('\n');
+function renderSourceAuthor({ author, works, translationsByWork }) {
+  const name = pickLocalized(author.names);
+  const initial = name.charAt(0);
+  const list = works.map((w) => renderWorkRow(w, (translationsByWork[w.uuid] || []).length)).join('\n');
 
   const body = `
 <div class="detail-hero">
   <div class="avatar-lg" style="background:var(--seal);">${escapeHtml(initial)}</div>
-  <h1>${escapeHtml(vm.name)}</h1>
+  <h1>${escapeHtml(name)}</h1>
 </div>
 
 <section class="block">
   <div class="block-head">
-    <div class="block-title serif">作品一覽 <span class="jp">Works</span>(${vm.works.length})</div>
+    <div class="block-title serif">作品一覽 <span class="jp">Works</span>(${works.length})</div>
   </div>
-  ${vm.works.length ? `<div class="entry-list">${list}</div>` : '<p class="block-empty-note">目前還沒有這位作者的作品被登記。</p>'}
+  ${works.length ? `<div class="entry-list">${list}</div>` : '<p class="block-empty-note">目前還沒有這位作者的作品被登記。</p>'}
 </section>
 `;
 
-  return { title: vm.name, body, canonical: vm.canonical };
+  return { title: name, body, canonical: `/source-authors/${author.uuid}/` };
 }
 
 module.exports = { renderSourceAuthor };
