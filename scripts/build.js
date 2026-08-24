@@ -494,4 +494,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { build, resolveAll, route };
+module.exports = { build, resolveAll, route, extractSiteId, detectDuplicates };
