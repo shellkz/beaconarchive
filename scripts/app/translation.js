@@ -1,10 +1,11 @@
 'use strict';
 
 const MarkdownIt = require('markdown-it');
+const footnote = require('markdown-it-footnote');
 const { escapeHtml, pickLocalized, workDisplayTitle } = require('./layout');
 
 const SITE_LICENSE = 'CC BY-SA 4.0';
-const md = new MarkdownIt({ html: false, linkify: true });
+const md = new MarkdownIt({ html: false, linkify: true }).use(footnote);
 
 function renderTranslation(t) {
   const work = t.work;

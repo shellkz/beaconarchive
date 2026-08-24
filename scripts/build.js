@@ -5,6 +5,7 @@ const path = require('path');
 const matter = require('gray-matter');
 const yaml = require('js-yaml');
 const MarkdownIt = require('markdown-it');
+const footnote = require('markdown-it-footnote');
 const {
   WorkSchema,
   SourceAuthorSchema,
@@ -29,7 +30,7 @@ const CONTENT_DIR = path.join(ROOT, 'content');
 const ASSETS_DIR = path.join(ROOT, 'assets');
 const OUT_DIR = path.join(ROOT, 'dist');
 
-const md = new MarkdownIt({ html: false, linkify: true });
+const md = new MarkdownIt({ html: false, linkify: true }).use(footnote);
 
 // ---------- small helpers ----------
 
