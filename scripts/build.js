@@ -3,7 +3,15 @@
 const fs = require('fs');
 const path = require('path');
 const matter = require('gray-matter');
+const yaml = require('js-yaml');
 const MarkdownIt = require('markdown-it');
+const {
+  WorkSchema,
+  SourceAuthorSchema,
+  SourceTranslatorSchema,
+  TranslatorSchema,
+  TranslationFrontmatterSchema,
+} = require('./models');
 const { renderLayout } = require('./app/layout');
 const { renderHomepage } = require('./app/homepage');
 const { renderTranslation } = require('./app/translation');
@@ -341,6 +349,204 @@ function resolveAll() {
   return { works, sourceAuthors, sourceTranslators, translators, translations };
 }
 
+// ---------- resolve references (zod) ----------
+
+function readFrontmatterForZod(fullPath) {
+  return matter(fs.readFileSync(fullPath, 'utf8'), {
+    engines: {
+      yaml: (s) => yaml.load(s, { schema: yaml.JSON_SCHEMA }),
+    },
+  });
+}
+
+function loadFlatRegistryForZod(subdir, schema) {
+  const dir = path.join(CONTENT_DIR, subdir);
+  if (!fs.existsSync(dir)) return {};
+
+  const map = {};
+  for (const filename of fs.readdirSync(dir).filter((f) => f.endsWith('.md'))) {
+    const fullPath = path.join(dir, filename);
+    const parsed = readFrontmatterForZod(fullPath);
+    const data = schema.parse(parsed.data);
+    map[data.uuid] = data;
+  }
+  return map;
+}
+
+function loadTranslatorsForZod() {
+  const translatorsDir = path.join(CONTENT_DIR, 'translators');
+  const map = {};
+  for (const translatorId of listDirs(translatorsDir)) {
+    const descPath = path.join(translatorsDir, translatorId, 'description.md');
+    map[translatorId] = fs.existsSync(descPath)
+      ? TranslatorSchema.parse(readFrontmatterForZod(descPath).data)
+      : null;
+  }
+  return map;
+}
+
+function loadTranslationsForZod() {
+  const translatorsDir = path.join(CONTENT_DIR, 'translators');
+  const translations = [];
+
+  for (const translatorId of listDirs(translatorsDir)) {
+    const translatorDir = path.join(translatorsDir, translatorId);
+    const files = fs
+      .readdirSync(translatorDir)
+      .filter((f) => f.endsWith('.md') && f !== 'description.md');
+
+    for (const filename of files) {
+      const fullPath = path.join(translatorDir, filename);
+      const parsed = readFrontmatterForZod(fullPath);
+      translations.push({
+        translatorId,
+        frontmatter: TranslationFrontmatterSchema.parse(parsed.data),
+        bodyMarkdown: parsed.content || '',
+      });
+    }
+  }
+  return translations;
+}
+
+function resolveAllForZod() {
+  const works = loadFlatRegistryForZod('works', WorkSchema);
+  const sourceAuthors = loadFlatRegistryForZod('source-authors', SourceAuthorSchema);
+  const sourceTranslators = loadFlatRegistryForZod('source-translators', SourceTranslatorSchema);
+  const translators = loadTranslatorsForZod();
+  const rawTranslations = loadTranslationsForZod();
+
+  const resolvedWorks = {};
+  for (const [uuid, work] of Object.entries(works)) {
+    resolvedWorks[uuid] = { ...work, author: sourceAuthors[work.author_id] || null };
+  }
+
+  const translations = rawTranslations.map((t) => {
+    const work = resolvedWorks[t.frontmatter.work_id] || null;
+    const edition = work ? (work.editions || []).find((e) => e.url === t.frontmatter.edition_url) || null : null;
+    const sourceTranslator =
+      edition && edition.translator_id ? sourceTranslators[edition.translator_id] || null : null;
+
+    return {
+      ...t.frontmatter,
+      translatorId: t.translatorId,
+      bodyMarkdown: t.bodyMarkdown,
+      work,
+      edition,
+      sourceTranslator,
+    };
+  });
+
+  const worksByAuthor = {};
+  for (const work of Object.values(resolvedWorks)) {
+    (worksByAuthor[work.author_id] ||= []).push(work);
+  }
+
+  const worksBySourceTranslator = {};
+  for (const work of Object.values(resolvedWorks)) {
+    for (const edition of work.editions || []) {
+      if (edition.translator_id) {
+        (worksBySourceTranslator[edition.translator_id] ||= []).push(work);
+      }
+    }
+  }
+
+  const translationsByWork = {};
+  const translationsByTranslator = {};
+  const translationsByTag = {};
+  for (const t of translations) {
+    (translationsByWork[t.work_id] ||= []).push(t);
+    (translationsByTranslator[t.translatorId] ||= []).push(t);
+    for (const tag of (t.work && t.work.tags) || []) {
+      (translationsByTag[tag] ||= []).push(t);
+    }
+  }
+
+  return {
+    works: resolvedWorks,
+    sourceAuthors,
+    sourceTranslators,
+    translators,
+    translations,
+    worksByAuthor,
+    worksBySourceTranslator,
+    translationsByWork,
+    translationsByTranslator,
+    translationsByTag,
+  };
+}
+
+// ---------- route (zod) ----------
+
+function routeForZod(graph) {
+  const routes = [];
+
+  const latestTranslations = [...graph.translations]
+    .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
+    .slice(0, 8);
+
+  routes.push({
+    url: '/',
+    render: renderHomepage,
+    data: { latestTranslations, translators: graph.translators, translationsByTranslator: graph.translationsByTranslator },
+  });
+
+  routes.push({
+    url: '/works/',
+    render: renderWorksIndex,
+    data: { works: graph.works, translationsByWork: graph.translationsByWork },
+  });
+
+  for (const [uuid, work] of Object.entries(graph.works)) {
+    routes.push({
+      url: `/works/${uuid}/`,
+      render: renderWork,
+      data: { work, translations: graph.translationsByWork[uuid] || [] },
+    });
+  }
+
+  for (const t of graph.translations) {
+    routes.push({ url: `/translations/${t.uuid}/`, render: renderTranslation, data: t });
+  }
+
+  const allTranslatorIds = new Set([...Object.keys(graph.translators), ...Object.keys(graph.translationsByTranslator)]);
+  for (const translatorId of allTranslatorIds) {
+    routes.push({
+      url: `/translators/${translatorId}/`,
+      render: renderTranslator,
+      data: {
+        translatorId,
+        profile: graph.translators[translatorId] || null,
+        translations: graph.translationsByTranslator[translatorId] || [],
+      },
+    });
+  }
+
+  for (const [uuid, author] of Object.entries(graph.sourceAuthors)) {
+    routes.push({
+      url: `/source-authors/${uuid}/`,
+      render: renderSourceAuthor,
+      data: { author, works: graph.worksByAuthor[uuid] || [] },
+    });
+  }
+
+  for (const [uuid, sourceTranslator] of Object.entries(graph.sourceTranslators)) {
+    routes.push({
+      url: `/source-translators/${uuid}/`,
+      render: renderSourceTranslator,
+      data: { sourceTranslator, works: graph.worksBySourceTranslator[uuid] || [] },
+    });
+  }
+
+  for (const [tag, list] of Object.entries(graph.translationsByTag)) {
+    routes.push({ url: `/tags/${tag}/`, render: renderTag, data: { tag, translations: list } });
+  }
+
+  routes.push({ url: '/workshop/create-translation/', render: renderWorkshop, data: null });
+  routes.push({ url: '/about/', render: renderAbout, data: null });
+
+  return routes;
+}
+
 // ---------- build ----------
 
 function build() {
@@ -623,4 +829,4 @@ if (require.main === module) {
   }
 }
 
-module.exports = { build };
+module.exports = { build, resolveAllForZod, routeForZod };
