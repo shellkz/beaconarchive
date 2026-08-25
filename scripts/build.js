@@ -17,6 +17,7 @@ const { renderLayout, pickLocalized, workDisplayTitle } = require('./app/layout'
 const { renderHomepage } = require('./app/homepage');
 const { renderTranslation } = require('./app/translation');
 const { renderTranslationEpub, sanitizeFilename } = require('./app/epub');
+const { renderSitemap } = require('./app/sitemap');
 const { renderWork } = require('./app/work');
 const { renderTranslator } = require('./app/translator');
 const { renderSourceAuthor } = require('./app/source-author');
@@ -481,6 +482,10 @@ async function build() {
   ensureDirFor(path.join(OUT_DIR, 'source-authors.json'));
   fs.writeFileSync(path.join(OUT_DIR, 'source-authors.json'), JSON.stringify(sourceAuthorsJson, null, 2), 'utf8');
 
+  // ---- /sitemap.xml(排除 epub 下載連結,那是既有頁面的另一種格式,不是獨立頁面)----
+  const sitemapUrls = routes.filter((r) => r.format !== 'epub').map((r) => r.url);
+  fs.writeFileSync(path.join(OUT_DIR, 'sitemap.xml'), renderSitemap(sitemapUrls), 'utf8');
+
   // ---- 複製 assets/ 靜態資源(CSS/JS)到 dist/assets/ ----
   if (fs.existsSync(ASSETS_DIR)) {
     fs.cpSync(ASSETS_DIR, path.join(OUT_DIR, 'assets'), { recursive: true });
@@ -490,6 +495,12 @@ async function build() {
   const FAVICON_PATH = path.join(ASSETS_DIR, 'images', 'favicon.ico');
   if (fs.existsSync(FAVICON_PATH)) {
     fs.copyFileSync(FAVICON_PATH, path.join(OUT_DIR, 'favicon.ico'));
+  }
+
+  // ---- 複製 robots.txt 到 dist/ 根目錄(靜態內容,不依賴 graph,跟 favicon.ico 同樣做法)----
+  const ROBOTS_PATH = path.join(ASSETS_DIR, 'robots.txt');
+  if (fs.existsSync(ROBOTS_PATH)) {
+    fs.copyFileSync(ROBOTS_PATH, path.join(OUT_DIR, 'robots.txt'));
   }
 
   return {
