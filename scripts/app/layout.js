@@ -76,7 +76,6 @@ ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<m
     </button>
     <nav id="site-nav">
       <a href="/works/">全部作品</a>
-      <a href="/workshop/create-translation/">翻譯者工坊</a>
       <a href="/about/">關於</a>
     </nav>
   </div>
