@@ -24,7 +24,6 @@ const { renderSourceAuthor } = require('./app/source-author');
 const { renderSourceTranslator } = require('./app/source-translator');
 const { renderTag } = require('./app/tag');
 const { renderWorksIndex } = require('./app/works-index');
-const { renderWorkshop } = require('./app/workshop');
 const { renderAbout } = require('./app/about');
 
 const ROOT = path.resolve(__dirname, '..');
@@ -421,7 +420,6 @@ function route(graph) {
     routes.push({ url: `/tags/${tag}/`, render: renderTag, data: { tag, translations: list } });
   }
 
-  routes.push({ url: '/workshop/create-translation/', render: renderWorkshop, data: null });
   routes.push({ url: '/about/', render: renderAbout, data: null });
 
   return routes;
