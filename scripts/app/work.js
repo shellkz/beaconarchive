@@ -67,7 +67,7 @@ function renderWork({ work, translations }) {
 
 `;
 
-  return { title: workDisplayTitle(work), body, canonical: `/works/${work.uuid}/` };
+  return { title: workDisplayTitle(work), body, canonical: `/works/${work.uuid}/`, description: work.excerpt };
 }
 
 module.exports = { renderWork };

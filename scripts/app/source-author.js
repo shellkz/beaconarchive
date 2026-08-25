@@ -32,7 +32,7 @@ function renderSourceAuthor({ author, works, translationsByWork }) {
 </section>
 `;
 
-  return { title: name, body, canonical: `/source-authors/${author.uuid}/` };
+  return { title: name, body, canonical: `/source-authors/${author.uuid}/`, description: author.excerpt };
 }
 
 module.exports = { renderSourceAuthor };

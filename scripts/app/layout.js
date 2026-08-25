@@ -7,6 +7,8 @@
 
 // 瀏覽器分頁標題統一結尾,單一位置維護,不用每個頁面 render 模組各自加。
 const SITE_NAME = '信標文庫';
+const SITE_URL = 'https://beaconarchive.org';
+const SITE_DESCRIPTION = '非營利且無廣告的公領域書籍（青空文庫、古騰堡計畫）翻譯分享平台。所有作品皆採用 CC BY-SA 4.0 開放授權。人人皆可免費閱讀、轉載、改作與商用（需標註原譯者）。';
 
 function escapeHtml(str) {
   return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => ({
@@ -38,14 +40,23 @@ function formatCharCount(n) {
   return `${Math.round(n / 10000)}萬字`;
 }
 
-function renderLayout({ title, body, canonical }) {
+function renderLayout({ title, body, canonical, description }) {
+  const metaDescription = description || SITE_DESCRIPTION;
+  const url = canonical ? `${SITE_URL}${canonical}` : SITE_URL;
   return `<!doctype html>
 <html lang="zh-Hant" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
-${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<link rel="preconnect" href="https://fonts.googleapis.com">
+<meta name="description" content="${escapeHtml(metaDescription)}">
+${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<meta property="og:type" content="website">
+<meta property="og:site_name" content="${escapeHtml(SITE_NAME)}">
+<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:description" content="${escapeHtml(metaDescription)}">
+<meta property="og:url" content="${escapeHtml(url)}">
+<meta name="twitter:card" content="summary">
+<link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@400;500;700;900&family=Shippori+Mincho:wght@400;500;700&family=Noto+Sans+TC:wght@300;400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/css/style.css">
 <script>document.documentElement.classList.replace('no-js','js');</script>
