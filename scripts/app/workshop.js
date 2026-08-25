@@ -13,7 +13,7 @@
 // 成做完了。每個欄位旁邊的 ✓ 記號則是即時的欄位層級驗證提示,跟按鈕
 // 是否可按互相獨立(見 assets/js/workshop.js)。
 // 這支檔案本身只負責吐出完整的 HTML 結構,不含任何互動邏輯
-// (見架構規格.md、開發者指南.md)。
+// (見架構規格.md)。
 
 // 目前只收青空文庫、古騰堡計畫這兩個來源(避免自行認定公版狀態帶來的
 // 著作權風險,見翻譯者指南.md),用 pattern 屬性擋掉其他網址——跟
@@ -28,7 +28,7 @@ const WIKIDATA_URL_PATTERN = 'https://www\\.wikidata\\.org/(wiki|entity)/Q\\d+';
 
 // 欄位標籤盡量精簡(必填的話就只留欄位名,選填就只加「(選填)」),其餘
 // 補充說明(可以搜尋什麼格式、範例連結等)收進點擊展開的 <details>,不塞
-// 在標籤文字裡——這是原生的點擊式提示,不用 JS,見開發者指南.md。
+// 在標籤文字裡——這是原生的點擊式提示,不用 JS。
 function renderFieldHelp(text) {
   return `<details class="field-help"><summary aria-label="說明">?</summary><p>${text}</p></details>`;
 }
