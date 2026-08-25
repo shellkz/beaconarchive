@@ -3,6 +3,7 @@
 const MarkdownIt = require('markdown-it');
 const footnote = require('markdown-it-footnote');
 const { escapeHtml, pickLocalized, workDisplayTitle } = require('./layout');
+const { sanitizeFilename } = require('./epub');
 
 const SITE_LICENSE = 'CC BY-SA 4.0';
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true }).use(footnote);
@@ -43,6 +44,7 @@ ${md.render(t.bodyMarkdown)}
     <div class="row"><span class="label">來源版本</span><a href="${escapeHtml(t.edition_url)}">${escapeHtml(editionPublisher || t.edition_url)}</a>(語言:${escapeHtml(edition.language)})</div>
     ${sourceTranslatorName ? `<div class="row"><span class="label">該版本譯者</span><a href="/source-translators/${escapeHtml(t.sourceTranslator.uuid)}/">${escapeHtml(sourceTranslatorName)}</a></div>` : ''}
     <div class="row"><span class="label">本譯文授權</span><span class="license-badge">${escapeHtml(SITE_LICENSE)}</span></div>
+    <div class="row"><span class="label">下載</span><a href="/translations/${escapeHtml(t.uuid)}/${escapeHtml(sanitizeFilename(t.title))}.epub">下載 EPUB</a></div>
   </div>
 </div>
 `;

@@ -16,6 +16,7 @@ const {
 const { renderLayout, pickLocalized, workDisplayTitle } = require('./app/layout');
 const { renderHomepage } = require('./app/homepage');
 const { renderTranslation } = require('./app/translation');
+const { renderTranslationEpub, sanitizeFilename } = require('./app/epub');
 const { renderWork } = require('./app/work');
 const { renderTranslator } = require('./app/translator');
 const { renderSourceAuthor } = require('./app/source-author');
@@ -49,6 +50,11 @@ function ensureDirFor(filePath) {
 function writeHtml(outPath, html) {
   ensureDirFor(outPath);
   fs.writeFileSync(outPath, html, 'utf8');
+}
+
+function writeEpub(outPath, buffer) {
+  ensureDirFor(outPath);
+  fs.writeFileSync(outPath, buffer);
 }
 
 // 譯者貢獻字數統計:只算正文(不含標題/摘要等其他欄位),流程是 markdown
@@ -373,6 +379,12 @@ function route(graph) {
 
   for (const t of graph.translations) {
     routes.push({ url: `/translations/${t.uuid}/`, render: renderTranslation, data: t });
+    routes.push({
+      url: `/translations/${t.uuid}/${sanitizeFilename(t.title)}.epub`,
+      format: 'epub',
+      render: renderTranslationEpub,
+      data: t,
+    });
   }
 
   const allTranslatorIds = new Set([...Object.keys(graph.translators), ...Object.keys(graph.translationsByTranslator)]);
@@ -416,14 +428,19 @@ function route(graph) {
 
 // ---------- build ----------
 
-function build() {
+async function build() {
   fs.rmSync(OUT_DIR, { recursive: true, force: true });
 
   const graph = resolveAll();
   const routes = route(graph);
 
-  for (const { url, render, data } of routes) {
-    writeHtml(path.join(OUT_DIR, url, 'index.html'), renderLayout(render(data)));
+  for (const { url, format, render, data } of routes) {
+    if (format === 'epub') {
+      const buffer = await render(data);
+      writeEpub(path.join(OUT_DIR, url), buffer);
+    } else {
+      writeHtml(path.join(OUT_DIR, url, 'index.html'), renderLayout(render(data)));
+    }
   }
 
   // ---- /translations.json ----
@@ -486,13 +503,12 @@ function build() {
 }
 
 if (require.main === module) {
-  try {
-    const stats = build();
-    console.log('Build 成功:', JSON.stringify(stats, null, 2));
-  } catch (err) {
-    console.error(err.message);
-    process.exit(1);
-  }
+  build()
+    .then((stats) => console.log('Build 成功:', JSON.stringify(stats, null, 2)))
+    .catch((err) => {
+      console.error(err.message);
+      process.exit(1);
+    });
 }
 
 module.exports = { build, resolveAll, route, extractSiteId, detectDuplicates };
