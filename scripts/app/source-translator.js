@@ -28,7 +28,12 @@ function renderSourceTranslator({ sourceTranslator, works }) {
 </section>
 `;
 
-  return { title: name, body, canonical: `/source-translators/${sourceTranslator.uuid}/` };
+  return {
+    title: name,
+    body,
+    canonical: `/source-translators/${sourceTranslator.uuid}/`,
+    description: `收錄所有由${name}中間翻譯的作品。`,
+  };
 }
 
 module.exports = { renderSourceTranslator };

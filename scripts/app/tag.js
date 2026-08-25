@@ -26,7 +26,12 @@ function renderTag({ tag, translations }) {
 </section>
 `;
 
-  return { title: `標籤:${tag}`, body, canonical: `/tags/${tag}/` };
+  return {
+    title: `標籤:${tag}`,
+    body,
+    canonical: `/tags/${tag}/`,
+    description: `收錄所有含有「${tag}」標籤的作品。`,
+  };
 }
 
 module.exports = { renderTag };

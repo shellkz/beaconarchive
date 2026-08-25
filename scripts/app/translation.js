@@ -49,7 +49,7 @@ ${md.render(t.bodyMarkdown)}
 </div>
 `;
 
-  return { title: t.title, body, canonical: `/translations/${t.uuid}/` };
+  return { title: t.title, body, canonical: `/translations/${t.uuid}/`, description: t.excerpt };
 }
 
 module.exports = { renderTranslation };
