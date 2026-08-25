@@ -99,4 +99,4 @@ ${body}
 `;
 }
 
-module.exports = { renderLayout, escapeHtml, pickLocalized, workDisplayTitle, formatCharCount };
+module.exports = { renderLayout, escapeHtml, pickLocalized, workDisplayTitle, formatCharCount, SITE_URL };
