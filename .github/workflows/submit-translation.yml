@@ -1,0 +1,48 @@
+name: Submit Translation
+
+on:
+  repository_dispatch:
+    types: [submit-translation]
+
+jobs:
+  submit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AUTOMATION_PAT }}
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: 執行提交翻譯腳本
+        env:
+          PAYLOAD: ${{ toJson(github.event.client_payload) }}
+        run: node cli/submit-translation.js
+
+      - name: 建立分支並提交
+        env:
+          TRANSLATOR_ID: ${{ github.event.client_payload.translatorId }}
+          WORK_TITLE: ${{ github.event.client_payload.workTitleZh }}
+        run: |
+          git config user.name "$TRANSLATOR_ID"
+          git config user.email "automation@beaconarchive.org"
+          BRANCH="submission/${TRANSLATOR_ID}-$(date +%s)"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+          git checkout -b "$BRANCH"
+          git add content/
+          git commit -m "翻譯：${WORK_TITLE}" -m "translator-id: ${TRANSLATOR_ID}"
+          git push origin "$BRANCH"
+
+      - name: 開 PR 並設定 auto-merge
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMATION_PAT }}
+          TRANSLATOR_ID: ${{ github.event.client_payload.translatorId }}
+          WORK_TITLE: ${{ github.event.client_payload.workTitleZh }}
+        run: |
+          gh pr create --title "翻譯：${WORK_TITLE}" --body "translator-id: ${TRANSLATOR_ID}" --head "$BRANCH"
+          gh pr merge "$BRANCH" --auto --squash

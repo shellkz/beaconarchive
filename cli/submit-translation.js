@@ -200,12 +200,14 @@ async function submitTranslation(payload) {
 }
 
 async function main() {
-  const arg = process.argv[2];
-  if (!arg) {
-    console.error("用法:node cli/submit-translation.js '<json payload>'");
+  // CI 走環境變數(避免把外部輸入直接拼進 shell 指令字串);本機手動測試
+  // 保留吃 argv 當備援,兩種都支援。
+  const raw = process.env.PAYLOAD || process.argv[2];
+  if (!raw) {
+    console.error("用法:node cli/submit-translation.js '<json payload>'(或設定 PAYLOAD 環境變數)");
     process.exit(1);
   }
-  const payload = JSON.parse(arg);
+  const payload = JSON.parse(raw);
   try {
     await submitTranslation(payload);
   } catch (err) {
