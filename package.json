@@ -9,6 +9,7 @@
     "wrangler": "4.122.0"
   },
   "dependencies": {
+    "cheerio": "^1.0.0",
     "epub-gen-memory": "^1.1.2",
     "gray-matter": "^4.0.3",
     "markdown-it": "^15.0.0",
