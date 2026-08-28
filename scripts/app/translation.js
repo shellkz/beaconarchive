@@ -18,8 +18,11 @@ function renderTranslation(t) {
 
   const body = `
 <div id="reading-settings" class="reading-settings">
-  <div class="reading-settings-bar"></div>
-  <div class="reading-settings-body">
+  <div id="reading-settings-bar" class="reading-settings-bar">
+    <button type="button" id="reading-settings-close" class="reading-settings-close" aria-label="關閉閱讀設定"></button>
+    <button type="button" id="reading-settings-toggle" class="reading-settings-toggle" aria-label="開啟閱讀設定"></button>
+  </div>
+  <div id="reading-settings-body" class="reading-settings-body">
     <div class="setting-row">
       <span class="setting-label">文字大小</span>
       <div class="setting-control">
