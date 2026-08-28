@@ -17,6 +17,24 @@ function renderTranslation(t) {
   const sourceTranslatorName = t.sourceTranslator ? pickLocalized(t.sourceTranslator.names) : null;
 
   const body = `
+<div id="reading-settings" class="reading-settings">
+  <div class="reading-settings-bar"></div>
+  <div class="reading-settings-body">
+    <div class="setting-row">
+      <span class="setting-label">文字大小</span>
+      <span class="setting-control">(尚未實作)</span>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">行距</span>
+      <span class="setting-control">(尚未實作)</span>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">主題</span>
+      <span class="setting-control">(尚未實作)</span>
+    </div>
+  </div>
+</div>
+
 <div class="breadcrumb">
   <a href="/">首頁</a><span class="sep">›</span>
   <a href="/works/${escapeHtml(work.uuid)}/">${escapeHtml(workDisplayTitle(work))}</a><span class="sep">›</span>
@@ -47,6 +65,7 @@ ${md.render(t.bodyMarkdown)}
     <div class="row"><span class="label">下載</span><a href="/translations/${escapeHtml(t.uuid)}/${escapeHtml(sanitizeFilename(t.title))}.epub">下載 EPUB</a></div>
   </div>
 </div>
+<script src="/assets/js/reading-settings.js" defer></script>
 `;
 
   return { title: t.title, body, canonical: `/translations/${t.uuid}/`, description: t.excerpt };

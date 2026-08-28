@@ -300,6 +300,35 @@ footer{
 .ref-link:hover{border-bottom-style:solid;}
 
 /* ===== 譯文內容頁(窄欄閱讀版面) ===== */
+
+/* 閱讀設定面板:預設(無 JS)完全不出現,靠 reading-settings.js 加 .is-open
+   才會顯示——沒有 JS 就沒有手勢監聽,行為等同這個元件不存在,不會有按了
+   沒反應的問題。目前只是雛形,設定項目還沒有真正的互動元件。 */
+.reading-settings{
+  display:none; flex-direction:column;
+  position:fixed; top:0; left:0; right:0; z-index:50;
+  background:var(--paper); border-bottom:1px solid var(--paper-deep);
+  box-shadow:0 10px 24px rgba(32,31,27,0.14);
+}
+.reading-settings.is-open{display:flex;}
+/* 純裝飾用的頂條,填滿整個螢幕寬度(不受下面 720px 窄欄限制)——
+   日後可以放其他設定按鈕(例如關閉鍵、更多選項),現在先留空。 */
+.reading-settings-bar{
+  width:100%; height:44px;
+  background:var(--paper-deep);
+}
+.reading-settings-body{
+  display:flex; flex-direction:column; gap:14px;
+  max-width:720px; margin:0 auto; width:100%;
+  padding:22px 28px;
+}
+.setting-row{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:14px;
+}
+.setting-label{color:var(--ink);}
+.setting-control{color:var(--gray);}
+
 .breadcrumb{
   max-width:720px; margin:0 auto; padding:28px 28px 0;
   font-size:12.5px; color:var(--gray); display:flex; align-items:center; gap:8px; flex-wrap:wrap;
