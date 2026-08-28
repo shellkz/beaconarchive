@@ -39,7 +39,11 @@ function renderTranslation(t) {
     </div>
     <div class="setting-row">
       <span class="setting-label">主題</span>
-      <span class="setting-control">(尚未實作)</span>
+      <div class="setting-control">
+        <button type="button" class="theme-btn" data-theme="white" aria-label="白色主題"></button>
+        <button type="button" class="theme-btn" data-theme="beige" aria-label="米色主題"></button>
+        <button type="button" class="theme-btn" data-theme="dark" aria-label="深色主題"></button>
+      </div>
     </div>
   </div>
 </div>

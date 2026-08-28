@@ -137,3 +137,48 @@
     });
   });
 })();
+
+// 閱讀主題(白/米/深):跟字體大小同一套「存 localStorage、沒存過就用預設」
+// 邏輯,差別是主題是固定選項不是數值,所以不用 clamp/min/max,直接存字串。
+// 套用方式是在 <html> 上加 data-reading-theme,實際配色由 style.css 的
+// :root[data-reading-theme="..."] 覆寫 --paper/--ink 等 token——米色是預設,
+// 不需要屬性,所以套用米色時直接把屬性拿掉,不留下多餘標記。
+(function () {
+  const THEME_STORAGE_KEY = 'reading-theme';
+  const THEME_ATTR = 'data-reading-theme';
+  const DEFAULT_THEME = 'beige';
+  const VALID_THEMES = ['white', 'beige', 'dark'];
+
+  function readStoredTheme() {
+    try {
+      const raw = localStorage.getItem(THEME_STORAGE_KEY);
+      return VALID_THEMES.includes(raw) ? raw : DEFAULT_THEME;
+    } catch (e) {
+      return DEFAULT_THEME;
+    }
+  }
+
+  function applyTheme(theme) {
+    if (theme === DEFAULT_THEME) {
+      document.documentElement.removeAttribute(THEME_ATTR);
+    } else {
+      document.documentElement.setAttribute(THEME_ATTR, theme);
+    }
+    document.querySelectorAll('.theme-btn').forEach((btn) => {
+      btn.classList.toggle('is-active', btn.dataset.theme === theme);
+    });
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch (e) {
+      // 存不進去就當這次不記,不影響當下畫面已經套用的主題
+    }
+  }
+
+  applyTheme(readStoredTheme());
+
+  document.querySelectorAll('.theme-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      if (VALID_THEMES.includes(btn.dataset.theme)) applyTheme(btn.dataset.theme);
+    });
+  });
+})();
