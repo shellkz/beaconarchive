@@ -22,11 +22,17 @@ function renderTranslation(t) {
   <div class="reading-settings-body">
     <div class="setting-row">
       <span class="setting-label">文字大小</span>
-      <span class="setting-control">(尚未實作)</span>
+      <div class="setting-control">
+        <button type="button" class="setting-btn" data-setting="font-size" data-action="decrease" aria-label="縮小文字">A−</button>
+        <button type="button" class="setting-btn" data-setting="font-size" data-action="increase" aria-label="放大文字">A+</button>
+      </div>
     </div>
     <div class="setting-row">
-      <span class="setting-label">行距</span>
-      <span class="setting-control">(尚未實作)</span>
+      <span class="setting-label">段落間距</span>
+      <div class="setting-control">
+        <button type="button" class="setting-btn" data-setting="paragraph-spacing" data-action="decrease" aria-label="縮小段落間距">−</button>
+        <button type="button" class="setting-btn" data-setting="paragraph-spacing" data-action="increase" aria-label="放大段落間距">+</button>
+      </div>
     </div>
     <div class="setting-row">
       <span class="setting-label">主題</span>

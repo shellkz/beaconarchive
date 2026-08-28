@@ -43,3 +43,55 @@
     if (!moved) handleTap(e.target);
   });
 })();
+
+// 實際的設定值:存成 CSS 變數掛在 <html> 上,.article-body 的樣式用
+// var(--reading-xxx, 預設值) 讀,沒設定過就照預設值,不影響沒有 JS 的情況。
+// 偏好存 localStorage,是每個訪客自己裝置上的顯示設定,不需要、也不該同步
+// 到伺服器或跨裝置。
+(function () {
+  const SETTINGS = {
+    'font-size': { cssVar: '--reading-font-size', unit: 'px', step: 1, min: 19, max: 29, default: 24, storageKey: 'reading-font-size' },
+    'paragraph-spacing': { cssVar: '--reading-para-spacing', unit: 'em', step: 0.2, min: 0.8, max: 3, default: 1.6, storageKey: 'reading-para-spacing' },
+  };
+
+  function clamp(value, min, max) {
+    return Math.min(max, Math.max(min, value));
+  }
+
+  function readStored(key, fallback) {
+    try {
+      const raw = localStorage.getItem(key);
+      const num = parseFloat(raw);
+      return Number.isFinite(num) ? num : fallback;
+    } catch (e) {
+      return fallback;
+    }
+  }
+
+  function apply(name, value) {
+    const cfg = SETTINGS[name];
+    document.documentElement.style.setProperty(cfg.cssVar, value + cfg.unit);
+    try {
+      localStorage.setItem(cfg.storageKey, String(value));
+    } catch (e) {
+      // 存不進去(私密瀏覽/被擋)就當這次不記,不影響當下畫面已經套用的值
+    }
+  }
+
+  Object.keys(SETTINGS).forEach((name) => {
+    const cfg = SETTINGS[name];
+    apply(name, readStored(cfg.storageKey, cfg.default));
+  });
+
+  document.querySelectorAll('.setting-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const name = btn.dataset.setting;
+      const cfg = SETTINGS[name];
+      if (!cfg) return;
+      const current = readStored(cfg.storageKey, cfg.default);
+      const delta = btn.dataset.action === 'increase' ? cfg.step : -cfg.step;
+      const next = clamp(Math.round((current + delta) * 10) / 10, cfg.min, cfg.max);
+      apply(name, next);
+    });
+  });
+})();
