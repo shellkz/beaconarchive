@@ -66,12 +66,8 @@ ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<m
   <div class="header-inner">
     <a class="logo" href="/">
       <span class="logo-cn serif">信標文庫</span>
-      <span class="logo-jp">公領域文字作品翻譯分享網站</span>
     </a>
     <button type="button" class="nav-toggle" id="nav-toggle" aria-expanded="false" aria-controls="site-nav">
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
-      <span class="nav-toggle-bar"></span>
       <span class="sr-only">選單</span>
     </button>
     <nav id="site-nav">

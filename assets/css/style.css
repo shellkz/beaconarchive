@@ -34,21 +34,23 @@ body::before{
 }
 
 /* ===== header ===== */
+/* 用 color-mix 而不是寫死的 rgba,是為了讓閱讀頁的主題切換(見「譯文內容頁」
+   區塊)能連 header 一起變色──米色時算出來的值跟原本寫死的一樣,深色/白色
+   閱讀主題套用時 header 才會自動跟著 --paper/--ink 換色。 */
 header{
-  background:rgba(239,234,224,0.92);
+  background:color-mix(in srgb, var(--paper) 92%, transparent);
   backdrop-filter:blur(8px);
-  border-bottom:1px solid rgba(32,31,27,0.1);
+  border-bottom:1px solid color-mix(in srgb, var(--ink) 10%, transparent);
 }
 .header-inner{
   max-width:1180px; margin:0 auto;
-  padding:18px 28px;
+  padding:12px 28px;
   display:flex; align-items:center; justify-content:space-between;
 }
 .logo{
-  display:flex; flex-direction:column; align-items:flex-start; gap:2px;
+  display:flex; align-items:center;
 }
-.logo-cn{font-size:24px; font-weight:700; letter-spacing:0.15em;}
-.logo-jp{font-size:11px; color:var(--gray); letter-spacing:0.2em;}
+.logo-cn{font-size:18px; font-weight:700; letter-spacing:0.1em;}
 nav{display:flex; gap:36px; font-size:14px; letter-spacing:0.05em;}
 nav a{position:relative; padding:4px 0; color:var(--ink); opacity:0.75; transition:opacity .2s;}
 nav a:hover{opacity:1;}
@@ -67,11 +69,18 @@ nav a:hover::after{width:100%;}
    沒有 JS 時 nav 直接展開,不靠這顆按鈕也能看到完整導覽,見 nav-toggle.js。 */
 .nav-toggle{
   display:none;
-  flex-direction:column; justify-content:center; gap:5px;
-  width:32px; height:32px; padding:0;
-  background:none; border:none; cursor:pointer;
+  align-items:center; justify-content:center;
+  width:28px; height:28px; padding:0;
+  background:none; border:none; color:var(--ink); cursor:pointer;
 }
-.nav-toggle-bar{display:block; width:100%; height:2px; background:var(--ink);}
+.nav-toggle::before{
+  content:''; display:block; width:100%; height:100%;
+  background-color:currentColor;
+  -webkit-mask-image:url('/assets/images/menu.svg');
+  mask-image:url('/assets/images/menu.svg');
+  -webkit-mask-repeat:no-repeat; -webkit-mask-position:center; -webkit-mask-size:contain;
+  mask-repeat:no-repeat; mask-position:center; mask-size:contain;
+}
 
 @media (max-width:720px){
   .js .header-inner{flex-wrap:wrap;}
@@ -300,6 +309,103 @@ footer{
 .ref-link:hover{border-bottom-style:solid;}
 
 /* ===== 譯文內容頁(窄欄閱讀版面) ===== */
+
+/* 閱讀主題(白/米/深):只有譯文頁會載入 reading-settings.js,也只有這支
+   script 會設定 data-reading-theme,其他頁面不會出現這個屬性、不受影響。
+   米色是全站預設 token,不用覆寫;白色刻意只換 --paper,其餘沿用米色的值
+   (借用 :root 預設);深色則整組換成適合暗背景的配色。header 的底色/邊框
+   跟閱讀頁內文多處邊框用的是 color-mix(...var(--ink)...),會自動跟著這裡
+   換色,不用另外每條規則各自覆寫一次。 */
+:root[data-reading-theme="white"]{
+  --paper: #FFFFFF;
+}
+:root[data-reading-theme="dark"]{
+  --paper: #1B1A17;
+  --paper-deep: #131210;
+  --ink: #ECE7DA;
+  --gray: #9A9486;
+  --gray-deep: #C7C1B0;
+  --indigo: #7699C7;
+  --indigo-deep: #A9C2E3;
+}
+/* 這幾個是原本就寫死的絕對色(不是 var(--ink) 疊透明度),color-mix 救不到,
+   只能在深色主題下個別覆寫。 */
+:root[data-reading-theme="dark"] .byline,
+:root[data-reading-theme="dark"] .citation-card{
+  color: var(--gray-deep);
+}
+:root[data-reading-theme="dark"] .license-badge{
+  color: #D8B98A;
+}
+
+/* 閱讀設定:bar 跟 body 各自獨立開關,不是同一個 .is-open 控制兩層——
+   捲動只會顯示/收起 bar(誤觸影響小,只是條裝飾用的窄條),要按 bar 裡的
+   齒輪按鈕才會真的打開設定內容(body)。沒有 JS 就沒有任何監聽,兩者
+   預設都是 display:none,不會有按了沒反應的問題。 */
+.reading-settings{
+  display:flex; flex-direction:column;
+  position:fixed; top:0; left:0; right:0; width:100%; z-index:50;
+}
+.reading-settings-bar{
+  display:none;
+  width:100%; height:var(--header-height, 44px);
+  background:var(--paper);
+  box-shadow:0 2px 6px rgba(32,31,27,0.12);
+  align-items:center; justify-content:space-between;
+  padding:8px 8px;
+}
+.reading-settings-bar.is-visible{display:flex;}
+.reading-settings-toggle,
+.reading-settings-close{
+  width:28px; height:28px; border:none; border-radius:2px;
+  background:transparent; color:var(--ink); cursor:pointer;
+  display:flex; align-items:center; justify-content:center;
+}
+.reading-settings-toggle::before,
+.reading-settings-close::before{
+  content:''; display:block; width:100%; height:100%;
+  background-color:currentColor;
+  -webkit-mask-repeat:no-repeat; -webkit-mask-position:center; -webkit-mask-size:contain;
+  mask-repeat:no-repeat; mask-position:center; mask-size:contain;
+}
+.reading-settings-toggle::before{
+  -webkit-mask-image:url('/assets/images/settings.svg');
+  mask-image:url('/assets/images/settings.svg');
+}
+.reading-settings-close::before{
+  -webkit-mask-image:url('/assets/images/x.svg');
+  mask-image:url('/assets/images/x.svg');
+}
+.reading-settings-toggle:hover,
+.reading-settings-close:hover{background:color-mix(in srgb, var(--ink) 8%, transparent); color:var(--indigo);}
+.reading-settings-body{
+  display:none; flex-direction:column; gap:14px;
+  width:100%;
+  padding:22px 28px;
+  background:var(--paper); border-top:1px solid var(--paper-deep); border-bottom:1px solid var(--paper-deep);
+  box-shadow:0 2px 6px rgba(32,31,27,0.12);
+}
+.reading-settings-body.is-open{display:flex;}
+.setting-row{
+  display:flex; justify-content:space-between; align-items:center;
+  font-size:14px;
+}
+.setting-label{color:var(--ink);}
+.setting-control{color:var(--gray); display:flex; gap:8px;}
+.setting-btn{
+  width:32px; height:32px; border:1px solid color-mix(in srgb, var(--ink) 18%, transparent); border-radius:2px;
+  background:var(--paper); color:var(--ink); font-size:13px; cursor:pointer;
+}
+.setting-btn:hover{border-color:var(--indigo); color:var(--indigo);}
+.theme-btn{
+  width:22px; height:22px; border-radius:50%; padding:0; cursor:pointer;
+  border:2px solid color-mix(in srgb, var(--ink) 18%, transparent);
+}
+.theme-btn[data-theme="white"]{background:#FFFFFF;}
+.theme-btn[data-theme="beige"]{background:#EFEAE0;}
+.theme-btn[data-theme="dark"]{background:#1B1A17;}
+.theme-btn.is-active{border-color:var(--indigo);}
+
 .breadcrumb{
   max-width:720px; margin:0 auto; padding:28px 28px 0;
   font-size:12.5px; color:var(--gray); display:flex; align-items:center; gap:8px; flex-wrap:wrap;
@@ -310,7 +416,7 @@ footer{
 
 .article-header{
   max-width:720px; margin:0 auto; padding:36px 28px 40px;
-  border-bottom:1px solid rgba(32,31,27,0.12);
+  border-bottom:1px solid color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .article-header .work-jp{
   font-size:12.5px; color:var(--gray); letter-spacing:.15em; margin-bottom:12px;
@@ -330,10 +436,10 @@ footer{
 .article-body{
   max-width:720px; margin:0 auto; padding:48px 28px 8px;
   font-family:'Noto Serif TC', serif;
-  font-size:17px; line-height:2;
+  font-size:var(--reading-font-size, 24px); line-height:1.6;
   color:var(--ink);
 }
-.article-body p{margin-bottom:1.6em;}
+.article-body p{margin-bottom:var(--reading-para-spacing, 1.6em);}
 .article-end-mark{
   text-align:center; color:var(--gold); letter-spacing:.4em; font-size:12px;
   margin:8px 0 52px;
@@ -343,7 +449,7 @@ footer{
   color:var(--footnote-accent); font-weight:600; text-decoration:none;
 }
 .footnotes-sep{
-  margin:4.8em 0 1.6em; border:none; border-top:1px solid rgba(32,31,27,0.12);
+  margin:4.8em 0 1.6em; border:none; border-top:1px solid color-mix(in srgb, var(--ink) 12%, transparent);
 }
 .footnotes{
   margin:0;
@@ -376,7 +482,7 @@ footer{
   max-width:720px; margin:0 auto; padding:0 28px 64px;
 }
 .citation-card{
-  background:var(--paper-deep); border:1px solid rgba(32,31,27,0.08);
+  background:var(--paper-deep); border:1px solid color-mix(in srgb, var(--ink) 8%, transparent);
   border-radius:2px; padding:24px 26px; font-size:12.5px; color:#5a584f;
 }
 .citation-card .row{display:flex; gap:10px; margin-bottom:10px; flex-wrap:wrap;}
@@ -391,7 +497,7 @@ footer{
 }
 
 @media (max-width:600px){
-  .article-body{font-size:16px; line-height:1.9;}
+  .article-body{font-size:var(--reading-font-size, 32px); line-height:1.6;}
 }
 
 /* ===== 寬版詳情頁共用(work / translator / source-author / source-translator / tag) ===== */

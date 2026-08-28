@@ -17,6 +17,37 @@ function renderTranslation(t) {
   const sourceTranslatorName = t.sourceTranslator ? pickLocalized(t.sourceTranslator.names) : null;
 
   const body = `
+<div id="reading-settings" class="reading-settings">
+  <div id="reading-settings-bar" class="reading-settings-bar">
+    <button type="button" id="reading-settings-close" class="reading-settings-close" aria-label="關閉閱讀設定"></button>
+    <button type="button" id="reading-settings-toggle" class="reading-settings-toggle" aria-label="開啟閱讀設定"></button>
+  </div>
+  <div id="reading-settings-body" class="reading-settings-body">
+    <div class="setting-row">
+      <span class="setting-label">文字大小</span>
+      <div class="setting-control">
+        <button type="button" class="setting-btn" data-setting="font-size" data-action="decrease" aria-label="縮小文字">A−</button>
+        <button type="button" class="setting-btn" data-setting="font-size" data-action="increase" aria-label="放大文字">A+</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">段落間距</span>
+      <div class="setting-control">
+        <button type="button" class="setting-btn" data-setting="paragraph-spacing" data-action="decrease" aria-label="縮小段落間距">−</button>
+        <button type="button" class="setting-btn" data-setting="paragraph-spacing" data-action="increase" aria-label="放大段落間距">+</button>
+      </div>
+    </div>
+    <div class="setting-row">
+      <span class="setting-label">主題</span>
+      <div class="setting-control">
+        <button type="button" class="theme-btn" data-theme="white" aria-label="白色主題"></button>
+        <button type="button" class="theme-btn" data-theme="beige" aria-label="米色主題"></button>
+        <button type="button" class="theme-btn" data-theme="dark" aria-label="深色主題"></button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="breadcrumb">
   <a href="/">首頁</a><span class="sep">›</span>
   <a href="/works/${escapeHtml(work.uuid)}/">${escapeHtml(workDisplayTitle(work))}</a><span class="sep">›</span>
@@ -47,6 +78,7 @@ ${md.render(t.bodyMarkdown)}
     <div class="row"><span class="label">下載</span><a href="/translations/${escapeHtml(t.uuid)}/${escapeHtml(sanitizeFilename(t.title))}.epub">下載 EPUB</a></div>
   </div>
 </div>
+<script src="/assets/js/reading-settings.js" defer></script>
 `;
 
   return { title: t.title, body, canonical: `/translations/${t.uuid}/`, description: t.excerpt };
