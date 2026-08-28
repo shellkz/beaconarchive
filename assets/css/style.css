@@ -7,6 +7,8 @@
   --seal: #A23B2E;
   --gold: #B8935A;
   --gray: #8B8578;
+  --gray-deep: #565148;
+  --footnote-accent: #2F8F8A;
 }
 *{margin:0;padding:0;box-sizing:border-box;}
 html{scroll-behavior:smooth;}
@@ -332,14 +334,42 @@ footer{
   color:var(--ink);
 }
 .article-body p{margin-bottom:1.6em;}
-.article-body > p:first-of-type::first-letter{
-  font-family:'Shippori Mincho',serif;
-  font-size:3.1em; float:left; line-height:.85;
-  padding:.05em .14em 0 0; color:var(--indigo);
-}
 .article-end-mark{
   text-align:center; color:var(--gold); letter-spacing:.4em; font-size:12px;
   margin:8px 0 52px;
+}
+
+.footnote-ref a{
+  color:var(--footnote-accent); font-weight:600; text-decoration:none;
+}
+.footnotes-sep{
+  margin:4.8em 0 1.6em; border:none; border-top:1px solid rgba(32,31,27,0.12);
+}
+.footnotes{
+  margin:0;
+}
+.footnotes-list{
+  padding-left:0; margin-left:0; list-style:none;
+  counter-reset:footnote;
+}
+.footnote-item{
+  font-size:.9em; color:var(--gray-deep); margin-bottom:.125em;
+  counter-increment:footnote;
+  display:flex; gap:.4em;
+}
+.footnote-item::before{
+  content:counter(footnote) ".";
+  flex-shrink:0;
+}
+.footnote-item p{margin-bottom:0;}
+.footnote-backref{color:var(--footnote-accent); text-decoration:none;}
+
+:target{
+  animation: footnote-flash 2s ease-out;
+}
+@keyframes footnote-flash{
+  from{ background: color-mix(in srgb, var(--footnote-accent) 25%, transparent); }
+  to{ background: transparent; }
 }
 
 .citation-block{
