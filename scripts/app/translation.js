@@ -62,6 +62,8 @@ function renderTranslation(t) {
     <span class="dot">·</span>
     <span>原作・<a href="/source-authors/${escapeHtml(work.author_id)}/">${escapeHtml(authorName)}</a></span>
     ${t.date ? `<span class="dot">·</span><span>${escapeHtml(t.date)}</span>` : ''}
+    <span class="dot">·</span>
+    <span>瀏覽 ${t.viewCount} 次</span>
   </div>
 </div>
 

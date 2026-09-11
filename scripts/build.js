@@ -31,6 +31,18 @@ const ROOT = path.resolve(__dirname, '..');
 const CONTENT_DIR = path.join(ROOT, 'content');
 const ASSETS_DIR = path.join(ROOT, 'assets');
 const OUT_DIR = path.join(ROOT, 'dist');
+const ACCESS_COUNT_PATH = path.join(ROOT, 'data', 'access-count.json');
+
+// data/access-count.json 是排程管線維護的狀態(見 cli/update-access-count.js),
+// 不是人手寫的 content——讀不到或格式壞掉就當作還沒有任何瀏覽量,不讓 build 失敗。
+function readAccessCount() {
+  try {
+    const data = JSON.parse(fs.readFileSync(ACCESS_COUNT_PATH, 'utf8'));
+    return { total: data.total || 0, translations: data.translations || {} };
+  } catch (e) {
+    return { total: 0, translations: {} };
+  }
+}
 
 const md = new MarkdownIt({ html: false, linkify: true, breaks: true }).use(footnote);
 
@@ -353,6 +365,7 @@ function resolveAll() {
 
 function route(graph) {
   const routes = [];
+  const accessCount = readAccessCount();
 
   const latestTranslations = [...graph.translations]
     .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
@@ -366,6 +379,7 @@ function route(graph) {
       translators: graph.translators,
       translationsByTranslator: graph.translationsByTranslator,
       worksCount: Object.keys(graph.works).length,
+      totalViews: accessCount.total,
     },
   });
 
@@ -384,7 +398,11 @@ function route(graph) {
   }
 
   for (const t of graph.translations) {
-    routes.push({ url: `/translations/${t.uuid}/`, render: renderTranslation, data: t });
+    routes.push({
+      url: `/translations/${t.uuid}/`,
+      render: renderTranslation,
+      data: { ...t, viewCount: accessCount.translations[t.uuid] || 0 },
+    });
     routes.push({
       url: `/translations/${t.uuid}/${sanitizeFilename(t.title)}.epub`,
       format: 'epub',

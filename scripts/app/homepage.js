@@ -5,10 +5,10 @@ const { escapeHtml, pickLocalized, formatCharCount } = require('./layout');
 const COVER_CLASSES = ['c1', 'c2', 'c3', 'c4', 'c5', 'c6', 'c7', 'c8'];
 const AVATAR_COLORS = ['var(--indigo)', 'var(--seal)', '#5b6b4f', '#8a6a3f', '#3a5560', '#7a3f56'];
 
-function renderSearchForm(worksCount) {
+function renderSearchForm(worksCount, totalViews) {
   return `
 <section class="block" id="search" style="padding-bottom:0;">
-  <p class="translator-stats">目前收錄 ${worksCount} 部作品</p>
+  <p class="translator-stats">目前收錄 ${worksCount} 部作品・累計瀏覽 ${totalViews} 次</p>
   <form method="get" action="/works/" class="home-search">
     <input type="search" name="q" placeholder="搜尋作品標題" aria-label="搜尋作品標題">
     <button type="submit" aria-label="搜尋">🔍</button>
@@ -51,7 +51,7 @@ function renderTranslatorCard(translatorId, profile, translations, index) {
     </a>`;
 }
 
-function renderHomepage({ latestTranslations, translators, translationsByTranslator, worksCount }) {
+function renderHomepage({ latestTranslations, translators, translationsByTranslator, worksCount, totalViews }) {
   const latestHtml = latestTranslations.map(renderLatestCard).join('\n');
   const translatorIds = Object.keys(translationsByTranslator);
   const translatorsHtml = translatorIds
@@ -59,7 +59,7 @@ function renderHomepage({ latestTranslations, translators, translationsByTransla
     .join('\n');
 
   const body = `
-${renderSearchForm(worksCount)}
+${renderSearchForm(worksCount, totalViews)}
 
 <section class="block" id="latest">
   <div class="block-head">
