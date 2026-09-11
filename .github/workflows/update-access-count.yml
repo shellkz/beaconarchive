@@ -5,14 +5,13 @@ on:
     - cron: '0 18 * * *'
   workflow_dispatch: {}
 
-permissions:
-  contents: write
-
 jobs:
   update:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.AUTOMATION_PAT }}
 
       - uses: actions/setup-node@v4
         with:
@@ -27,14 +26,28 @@ jobs:
           CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
         run: node cli/update-access-count.js
 
-      - name: 提交變更(沒有變化就略過)
+      - name: 建立分支並提交(沒有變化就略過)
+        id: commit
         run: |
           git config user.name "access-count-bot"
           git config user.email "automation@beaconarchive.org"
           git add data/access-count.json
           if git diff --cached --quiet; then
             echo "沒有變化，略過提交"
+            echo "changed=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
+          BRANCH="access-count-$(date +%s)"
+          echo "BRANCH=$BRANCH" >> "$GITHUB_ENV"
+          echo "changed=true" >> "$GITHUB_OUTPUT"
+          git checkout -b "$BRANCH"
           git commit -m "統計：更新瀏覽量統計"
-          git push origin main
+          git push origin "$BRANCH"
+
+      - name: 開 PR 並設定 auto-merge
+        if: steps.commit.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.AUTOMATION_PAT }}
+        run: |
+          gh pr create --title "統計：更新瀏覽量統計" --body "排程自動更新，見 cli/update-access-count.js。" --head "$BRANCH"
+          gh pr merge "$BRANCH" --auto --squash
