@@ -8,7 +8,7 @@
 // 瀏覽器分頁標題統一結尾,單一位置維護,不用每個頁面 render 模組各自加。
 const SITE_NAME = '信標文庫';
 const SITE_URL = 'https://beaconarchive.org';
-const SITE_DESCRIPTION = '非營利且無廣告的公領域書籍（青空文庫、古騰堡計畫）翻譯分享平台。所有作品皆採用 CC BY-SA 4.0 開放授權。人人皆可免費閱讀、轉載、改作與商用（需標註原譯者）。';
+const SITE_DESCRIPTION = '非營利且無廣告的公領域書籍（青空文庫、古騰堡計畫）翻譯分享平台。所有作品皆採用 CC BY-NC-ND 4.0 開放授權。人人皆可免費閱讀、非商業性轉載（需標註原譯者，禁止改作與商業使用）。';
 
 function escapeHtml(str) {
   return String(str == null ? '' : str).replace(/[&<>"']/g, (c) => ({
@@ -85,7 +85,7 @@ ${body}
       <a href="https://github.com/shellkz/PublicTranslationWebsite">原始碼</a>
       <a href="/about/">關於專案</a>
     </div>
-    <p class="footer-note">本專案收錄之原始文字作品皆已進入公領域 (Public Domain)。<br>由社群無償貢獻之翻譯文本，著作權歸原譯者所有，並統一以 <a class="ref-link" href="https://creativecommons.org/licenses/by-sa/4.0/">CC BY-SA 4.0</a> 授權釋出。<br>網站原始碼採用 <a class="ref-link" href="https://opensource.org/license/mit/">MIT</a> 授權開源於 GitHub。</p>
+    <p class="footer-note">本專案收錄之原始文字作品皆已進入公領域 (Public Domain)。<br>由社群無償貢獻之翻譯文本，著作權歸原譯者所有，並統一以 <a class="ref-link" href="https://creativecommons.org/licenses/by-nc-nd/4.0/">CC BY-NC-ND 4.0</a> 授權釋出。<br>網站原始碼採用 <a class="ref-link" href="https://opensource.org/license/mit/">MIT</a> 授權開源於 GitHub。</p>
   </div>
 </footer>
 <script src="/assets/js/nav-toggle.js" defer></script>

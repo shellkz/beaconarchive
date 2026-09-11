@@ -21,7 +21,7 @@ async function renderTranslationEpub(t) {
 <p>原作・${escapeHtml(authorName)}　譯者・${escapeHtml(t.translatorId)}</p>
 ${md.render(t.bodyMarkdown)}
 <hr>
-<p>來源版本：${escapeHtml(editionPublisher || t.edition_url)}(語言:${escapeHtml(edition.language)})<br>本譯文授權：CC BY-SA 4.0</p>
+<p>來源版本：${escapeHtml(editionPublisher || t.edition_url)}(語言:${escapeHtml(edition.language)})<br>本譯文授權：CC BY-NC-ND 4.0</p>
 `;
 
   return epub(
