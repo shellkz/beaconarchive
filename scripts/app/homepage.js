@@ -64,6 +64,7 @@ ${renderSearchForm(worksCount)}
 <section class="block" id="latest">
   <div class="block-head">
     <div class="block-title serif">最新譯作 <span class="jp">Latest Translations</span></div>
+    <a class="block-more" href="/works/">所有作品</a>
   </div>
   ${latestTranslations.length ? `<div class="grid">${latestHtml}</div>` : '<p class="block-empty-note">目前還沒有譯文,敬請期待。</p>'}
 </section>

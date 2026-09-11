@@ -356,7 +356,7 @@ function route(graph) {
 
   const latestTranslations = [...graph.translations]
     .sort((a, b) => String(b.date || '').localeCompare(String(a.date || '')))
-    .slice(0, 8);
+    .slice(0, 50);
 
   routes.push({
     url: '/',
