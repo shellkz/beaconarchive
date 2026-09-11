@@ -27,10 +27,10 @@ function renderTag({ tag, translations }) {
 `;
 
   return {
-    title: `標籤:${tag}`,
+    title: `${tag} 一覽`,
     body,
     canonical: `/tags/${tag}/`,
-    description: `收錄所有含有「${tag}」標籤的作品。`,
+    description: `信標文庫收錄的「${tag}」相關中文翻譯作品。`,
   };
 }
 

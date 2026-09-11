@@ -40,19 +40,20 @@ function formatCharCount(n) {
   return `${Math.round(n / 10000)}萬字`;
 }
 
-function renderLayout({ title, body, canonical, description }) {
+function renderLayout({ title, body, canonical, description, fullTitle }) {
   const metaDescription = description || SITE_DESCRIPTION;
+  const pageTitle = fullTitle || `${title} | ${SITE_NAME}`;
   const url = canonical ? `${SITE_URL}${canonical}` : SITE_URL;
   return `<!doctype html>
 <html lang="zh-Hant" class="no-js">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>${escapeHtml(title)} | ${escapeHtml(SITE_NAME)}</title>
+<title>${escapeHtml(pageTitle)}</title>
 <meta name="description" content="${escapeHtml(metaDescription)}">
 ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<meta property="og:type" content="website">
 <meta property="og:site_name" content="${escapeHtml(SITE_NAME)}">
-<meta property="og:title" content="${escapeHtml(title)}">
+<meta property="og:title" content="${escapeHtml(fullTitle || title)}">
 <meta property="og:description" content="${escapeHtml(metaDescription)}">
 <meta property="og:url" content="${escapeHtml(url)}">
 <meta name="twitter:card" content="summary">

@@ -82,7 +82,13 @@ ${md.render(t.bodyMarkdown)}
 <script src="/assets/js/reading-settings.js" defer></script>
 `;
 
-  return { title: t.title, body, canonical: `/translations/${t.uuid}/`, description: t.excerpt };
+  const fullTitle = `${authorName}《${t.title}》 | 信標文庫`;
+  const hasNativeTitle = workNativeTitle && workNativeTitle !== t.title;
+  const description = hasNativeTitle
+    ? `日文原名《${workNativeTitle}》。${t.excerpt || ''}`.trim()
+    : t.excerpt;
+
+  return { title: t.title, fullTitle, body, canonical: `/translations/${t.uuid}/`, description };
 }
 
 module.exports = { renderTranslation };

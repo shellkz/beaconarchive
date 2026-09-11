@@ -24,6 +24,7 @@ function renderTranslationRow(t) {
 
 function renderWork({ work, translations }) {
   const authorName = work.author ? pickLocalized(work.author.names) : '(未知作者)';
+  const displayTitle = workDisplayTitle(work);
   const nativeTitle = pickLocalized(work.title, ['ja', 'en', 'romaji', 'zh-TW']);
   const tags = work.tags || [];
 
@@ -40,7 +41,7 @@ function renderWork({ work, translations }) {
   const body = `
 <div class="detail-hero">
   ${nativeTitle ? `<div class="eyebrow serif">${escapeHtml(nativeTitle)}</div>` : ''}
-  <h1>${escapeHtml(workDisplayTitle(work))}</h1>
+  <h1>${escapeHtml(displayTitle)}</h1>
   <div class="detail-meta">
     <span>原作者・<a href="/source-authors/${escapeHtml(work.author_id)}/">${escapeHtml(authorName)}</a></span>
     <span>原文語言・${escapeHtml(work.original_language)}</span>
@@ -67,7 +68,19 @@ function renderWork({ work, translations }) {
 
 `;
 
-  return { title: workDisplayTitle(work), body, canonical: `/works/${work.uuid}/`, description: work.excerpt };
+  const fullTitle = `${authorName}《${displayTitle}》 | 信標文庫`;
+  const hasNativeTitle = nativeTitle && nativeTitle !== displayTitle;
+  const description = hasNativeTitle
+    ? `日文原名《${nativeTitle}》。${work.excerpt || ''}`.trim()
+    : work.excerpt;
+
+  return {
+    title: displayTitle,
+    fullTitle,
+    body,
+    canonical: `/works/${work.uuid}/`,
+    description,
+  };
 }
 
 module.exports = { renderWork };

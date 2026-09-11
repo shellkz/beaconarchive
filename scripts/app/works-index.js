@@ -91,7 +91,12 @@ ${renderFilters({ categories, languages, tags })}
 <script src="/assets/js/works-filter.js" defer></script>
 `;
 
-  return { title: '全部作品', body, canonical: '/works/' };
+  return {
+    title: '全部作品',
+    body,
+    canonical: '/works/',
+    description: '信標文庫收錄經典日本文學（青空文庫）的中文翻譯，可免費線上閱讀，也可下載 EPUB 離線閱讀。',
+  };
 }
 
 module.exports = { renderWorksIndex };

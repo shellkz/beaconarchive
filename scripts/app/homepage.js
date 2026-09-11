@@ -75,7 +75,13 @@ ${renderSearchForm()}
 </section>
 `;
 
-  return { title: '首頁', body };
+  return {
+    title: '首頁',
+    fullTitle: '信標文庫 | 日本文學線上閱讀',
+    body,
+    canonical: '/',
+    description: '信標文庫收錄經典日本文學（青空文庫）的中文翻譯，可免費線上閱讀，也可下載 EPUB 離線閱讀。',
+  };
 }
 
 module.exports = { renderHomepage, renderMetaField, COVER_CLASSES };
