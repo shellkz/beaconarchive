@@ -77,6 +77,7 @@ ${md.render(t.bodyMarkdown)}
     <div class="row"><span class="label">本譯文授權</span><span class="license-badge">${escapeHtml(SITE_LICENSE)}</span></div>
     <div class="row"><span class="label">下載</span><a href="/translations/${escapeHtml(t.uuid)}/${escapeHtml(sanitizeFilename(t.title))}.epub">下載 EPUB</a></div>
   </div>
+  <div class="cta-note">對翻譯有興趣嗎？<a href="/join/">成為翻譯者吧</a></div>
 </div>
 <script src="/assets/js/reading-settings.js" defer></script>
 `;

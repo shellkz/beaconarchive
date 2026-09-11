@@ -25,6 +25,7 @@ const { renderSourceTranslator } = require('./app/source-translator');
 const { renderTag } = require('./app/tag');
 const { renderWorksIndex } = require('./app/works-index');
 const { renderAbout } = require('./app/about');
+const { renderJoin } = require('./app/join');
 
 const ROOT = path.resolve(__dirname, '..');
 const CONTENT_DIR = path.join(ROOT, 'content');
@@ -421,6 +422,7 @@ function route(graph) {
   }
 
   routes.push({ url: '/about/', render: renderAbout, data: null });
+  routes.push({ url: '/join/', render: renderJoin, data: null });
 
   return routes;
 }

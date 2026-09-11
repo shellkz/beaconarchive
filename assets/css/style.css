@@ -495,6 +495,7 @@ footer{
   font-size:11px; letter-spacing:.05em; padding:3px 11px;
   border:1px solid var(--gold); color:#8a6a3f; border-radius:20px;
 }
+.citation-block .cta-note{margin-top:16px;}
 
 @media (max-width:600px){
   .article-body{font-size:var(--reading-font-size, 32px); line-height:1.6;}
@@ -512,6 +513,7 @@ footer{
   font-size:clamp(28px,4vw,42px); font-weight:700; margin-bottom:16px;
 }
 .detail-hero p.desc{font-size:14.5px; color:#4b4a44; max-width:640px; margin-bottom:16px;}
+.detail-hero .hero-actions{margin-top:24px; margin-bottom:8px;}
 .translator-stats{font-size:13px; color:var(--gray); letter-spacing:.03em; margin-bottom:16px;}
 .detail-meta{
   display:flex; flex-wrap:wrap; gap:8px 18px;
@@ -566,6 +568,16 @@ footer{
 }
 .cta-note a{color:var(--seal); font-weight:600;}
 .cta-note a:hover{text-decoration:underline;}
+
+/* ===== about / join 頁面共用的簡單內文段落 ===== */
+.page-section{max-width:640px; margin:40px 0 0;}
+.page-section h2{font-size:18px; font-weight:700; margin-bottom:14px;}
+.page-section ol,
+.page-section .license-terms{
+  padding-left:1.3em; display:flex; flex-direction:column; gap:10px;
+  color:#4b4a44; font-size:14px; line-height:1.7;
+}
+.page-section .hero-actions{margin-top:20px;}
 
 /* ===== 首頁搜尋框 ===== */
 .home-search{

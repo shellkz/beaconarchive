@@ -73,6 +73,7 @@ ${canonical ? `<link rel="canonical" href="${escapeHtml(canonical)}">\n` : ''}<m
     <nav id="site-nav">
       <a href="/works/">全部作品</a>
       <a href="/about/">關於</a>
+      <a href="/join/">成為翻譯者</a>
     </nav>
   </div>
 </header>

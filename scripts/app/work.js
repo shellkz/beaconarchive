@@ -35,7 +35,7 @@ function renderWork({ work, translations }) {
 
   const translationsSection = translations.length
     ? `<div class="entry-list">${translationsHtml}</div>`
-    : `<div class="cta-note">這部作品目前還沒有站內譯本——想成為第一個翻譯它的人嗎?見 <a href="https://github.com/shellkz/PublicTranslationWebsite/blob/main/docs/翻譯者指南.md">翻譯者指南</a>。</div>`;
+    : `<div class="cta-note">這部作品目前還沒有站內譯本——想成為第一個翻譯它的人嗎?見<a href="/join/">怎麼加入</a>。</div>`;
 
   const body = `
 <div class="detail-hero">
