@@ -1,0 +1,40 @@
+name: Update Access Count
+
+on:
+  schedule:
+    - cron: '0 18 * * *'
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - run: npm ci
+
+      - name: 更新瀏覽量統計
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ZONE_ID: ${{ secrets.CLOUDFLARE_ZONE_ID }}
+        run: node cli/update-access-count.js
+
+      - name: 提交變更(沒有變化就略過)
+        run: |
+          git config user.name "access-count-bot"
+          git config user.email "automation@beaconarchive.org"
+          git add data/access-count.json
+          if git diff --cached --quiet; then
+            echo "沒有變化，略過提交"
+            exit 0
+          fi
+          git commit -m "統計：更新瀏覽量統計"
+          git push origin main
