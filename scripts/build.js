@@ -361,7 +361,12 @@ function route(graph) {
   routes.push({
     url: '/',
     render: renderHomepage,
-    data: { latestTranslations, translators: graph.translators, translationsByTranslator: graph.translationsByTranslator },
+    data: {
+      latestTranslations,
+      translators: graph.translators,
+      translationsByTranslator: graph.translationsByTranslator,
+      worksCount: Object.keys(graph.works).length,
+    },
   });
 
   routes.push({

@@ -82,6 +82,7 @@ function renderWorksIndex({ works, translationsByWork }) {
   const body = `
 <div class="detail-hero">
   <h1>全部作品</h1>
+  <p class="translator-stats">目前收錄 ${Object.keys(works).length} 部作品</p>
 </div>
 ${renderFilters({ categories, languages, tags })}
 <section class="block">
