@@ -7,10 +7,9 @@
 // 檔案不存在/讀取失敗時,視為第一次執行——lastCountedAt 直接設成這次查詢的
 // 結束時間,不往回補歷史資料,等於「從現在開始算」，不需要另外手動建種子檔案。
 //
-// 注意:這裡的 GraphQL query(欄位名稱、dataset 名稱)是照 Cloudflare 文件
-// 記憶寫的,沒有實際帳號沒辦法離線驗證過。正式啟用前,務必先用 Cloudflare 的
-// GraphQL Analytics API 文件或 explorer 核對一次,確認 httpRequestsAdaptiveGroups
-// /clientRequestPath/botScore 這些欄位名稱、以及你的方案是否確實支援。
+// 沒有做機器人過濾:Cloudflare 的 botScore 欄位需要 Bot Management(更高方案
+// 等級)才能存取,實測目前這個 zone 的方案沒有權限用,查詢會直接被拒絕。數字
+// 因此會包含機器人流量——之後方案升級或找到其他可用欄位的話再補。
 
 const fs = require('fs');
 const path = require('path');
@@ -25,10 +24,6 @@ const CF_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
 // 緩衝,避免剛發生、還沒寫入完成的請求被漏算——下次查詢的起點會接在這次的終點
 // 之後,漏在緩衝區裡的那段不會再被補查。
 const INGESTION_LAG_BUFFER_MINUTES = 120;
-
-// Cloudflare bot score 是 1-99,分數越低代表越可能是機器人。只是想「簡單排除」,
-// 不追求精準,門檻抓寬鬆一點,漏掉幾個機器人不影響。
-const BOT_SCORE_THRESHOLD = 30;
 
 const TRANSLATION_PATH_RE = /^\/translations\/([0-9a-f-]{36})\/$/;
 
@@ -47,12 +42,12 @@ function writeAccessCount(data) {
 
 async function queryCloudflare(sinceIso, untilIso) {
   const query = `
-    query ViewCounts($zoneTag: String!, $since: Time!, $until: Time!, $botScoreMin: Int!) {
+    query ViewCounts($zoneTag: String!, $since: Time!, $until: Time!) {
       viewer {
         zones(filter: { zoneTag: $zoneTag }) {
           httpRequestsAdaptiveGroups(
             limit: 10000
-            filter: { datetime_geq: $since, datetime_lt: $until, botScore_geq: $botScoreMin }
+            filter: { datetime_geq: $since, datetime_lt: $until }
           ) {
             count
             dimensions {
@@ -72,7 +67,7 @@ async function queryCloudflare(sinceIso, untilIso) {
     },
     body: JSON.stringify({
       query,
-      variables: { zoneTag: CF_ZONE_ID, since: sinceIso, until: untilIso, botScoreMin: BOT_SCORE_THRESHOLD },
+      variables: { zoneTag: CF_ZONE_ID, since: sinceIso, until: untilIso },
     }),
   });
 
