@@ -29,10 +29,10 @@ function renderSourceTranslator({ sourceTranslator, works }) {
 `;
 
   return {
-    title: name,
+    title: `${name} 作品一覽`,
     body,
     canonical: `/source-translators/${sourceTranslator.uuid}/`,
-    description: `收錄所有由${name}中間翻譯的作品。`,
+    description: `${name}相關的作品，收錄於信標文庫。`,
   };
 }
 

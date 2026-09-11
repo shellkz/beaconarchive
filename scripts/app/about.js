@@ -19,7 +19,13 @@ function renderAbout() {
 </div>
 `;
 
-  return { title: '關於專案', body, canonical: '/about/' };
+  return {
+    title: '關於專案',
+    body,
+    canonical: '/about/',
+    description:
+      '信標文庫收錄經典日本文學（青空文庫）的中文翻譯，可免費線上閱讀，也可下載 EPUB 離線閱讀。這是一個非營利且無廣告的翻譯分享平台。翻譯者申請加入後，翻譯來自青空文庫的公領域作品，再透過 Google 表單無償提交譯文，發佈到網站上。所有作品皆採用 CC BY-NC-ND 4.0 開放授權——可自由轉載（需標註原譯者），但禁止改作與商業使用。',
+  };
 }
 
 module.exports = { renderAbout };

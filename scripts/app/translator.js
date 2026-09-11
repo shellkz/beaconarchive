@@ -33,8 +33,12 @@ function renderTranslator({ translatorId, profile, translations }) {
 </section>
 `;
 
-  const description = (profile && profile.bio) || `收錄所有由${displayName}翻譯的作品。`;
-  return { title: displayName, body, canonical: `/translators/${translatorId}/`, description };
+  return {
+    title: `${displayName} 翻譯作品一覽`,
+    body,
+    canonical: `/translators/${translatorId}/`,
+    description: profile && profile.bio,
+  };
 }
 
 module.exports = { renderTranslator };

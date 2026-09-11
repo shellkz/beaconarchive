@@ -50,7 +50,13 @@ function renderJoin() {
 </div>
 `;
 
-  return { title: '成為翻譯者', body, canonical: '/join/' };
+  return {
+    title: '成為翻譯者',
+    body,
+    canonical: '/join/',
+    description:
+      '沒有金錢報酬，翻譯來自青空文庫的公領域作品，發佈到網站上。除了可以累積翻譯作品的經驗，網站也提供譯者個人頁面，列出你翻譯過的所有作品，並能自訂顯示自我介紹與宣傳資訊。建議先挑選短篇的作品翻譯，能快速建立信心與手感，同時累積作品數量，也沒有版權疑慮。',
+  };
 }
 
 module.exports = { renderJoin };
