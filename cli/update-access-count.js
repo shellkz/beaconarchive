@@ -25,6 +25,13 @@ const CF_ZONE_ID = process.env.CLOUDFLARE_ZONE_ID;
 // 之後,漏在緩衝區裡的那段不會再被補查。
 const INGESTION_LAG_BUFFER_MINUTES = 120;
 
+// Cloudflare 的 httpRequestsAdaptiveGroups 硬性限制單次查詢區間不能超過 1 天,
+// 這裡抓 23 小時留一點餘裕。區間上限一定要大於排程間隔(見 workflow 的
+// cron,12 小時一次),不然每次只追得到新增的量,舊的落後永遠補不回來——
+// 23 > 12,所以就算某次排程延遲、或中斷了好幾天才恢復,也能連續執行幾次
+// 自動追上,不需要人工介入重設 lastCountedAt。
+const MAX_QUERY_SPAN_HOURS = 23;
+
 const TRANSLATION_PATH_RE = /^\/translations\/([0-9a-f-]{36})\/$/;
 
 function readAccessCount() {
@@ -104,7 +111,13 @@ async function updateAccessCount() {
     return existing;
   }
 
-  const rows = await queryCloudflare(since.toISOString(), until.toISOString());
+  const maxUntil = new Date(since.getTime() + MAX_QUERY_SPAN_HOURS * 60 * 60 * 1000);
+  const clampedUntil = until < maxUntil ? until : maxUntil;
+  if (clampedUntil < until) {
+    console.log(`落後區間超過 ${MAX_QUERY_SPAN_HOURS} 小時，這次只追到 ${clampedUntil.toISOString()}，剩下的留給下次執行。`);
+  }
+
+  const rows = await queryCloudflare(since.toISOString(), clampedUntil.toISOString());
 
   // total 是整站所有路徑的請求數加總(不限譯文頁),跟下面只挑
   // /translations/{uuid}/ 這種路徑累加的單篇統計是分開的兩件事。
@@ -121,14 +134,14 @@ async function updateAccessCount() {
   const merged = {
     total: existing.total + newTotal,
     translations: { ...existing.translations },
-    lastCountedAt: until.toISOString(),
+    lastCountedAt: clampedUntil.toISOString(),
   };
   for (const [uuid, delta] of Object.entries(translationDeltas)) {
     merged.translations[uuid] = (merged.translations[uuid] || 0) + delta;
   }
 
   writeAccessCount(merged);
-  console.log(`更新完成：新增 ${newTotal} 次瀏覽（${since.toISOString()} ~ ${until.toISOString()}）`);
+  console.log(`更新完成：新增 ${newTotal} 次瀏覽（${since.toISOString()} ~ ${clampedUntil.toISOString()}）`);
   return merged;
 }
 
